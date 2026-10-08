@@ -1,0 +1,37 @@
+name: WiFiSignal
+options:
+  bundleIdPrefix: com.wifisignal
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CLANG_ENABLE_MODULES: YES
+    ENABLE_HARDENED_RUNTIME: NO
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    OTHER_SWIFT_FLAGS: "-Xfrontend -disable-sandbox"
+
+targets:
+  WiFiSignal:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: Sources
+      - path: Resources
+    settings:
+      base:
+        PRODUCT_NAME: WiFiSignal
+        PRODUCT_BUNDLE_IDENTIFIER: com.wifisignal.macos
+        INFOPLIST_FILE: Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Resources/WiFiSignal.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+    dependencies:
+      - sdk: CoreWLAN.framework
+      - sdk: CoreLocation.framework
+      - sdk: Network.framework
