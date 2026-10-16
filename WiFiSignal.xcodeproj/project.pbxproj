@@ -26,6 +26,7 @@
 		B60F82AD0112DFA9BAAAF8D6 /* LiveHistoryGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781332F433DACDEB5B250D30 /* LiveHistoryGraph.swift */; };
 		D1C437880FC0697173616EF9 /* OptimizationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB766687931F26C37C98F360 /* OptimizationEngine.swift */; };
 		D488E1766B127BB3B33D3E62 /* OptimizationAdvice.swift in Sources */ = {isa = PBXBuildFile; fileRef = C413F25C17511EA40A0952F1 /* OptimizationAdvice.swift */; };
+		DDC1C08EF61CF0A369959A81 /* SignalBarsIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFC835F94FF64B4EA0620D6 /* SignalBarsIndicator.swift */; };
 		DDEAD51D3AEA535F96543146 /* ScannedNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 290D2A74717B9CE45AD98411 /* ScannedNetwork.swift */; };
 		E1C8CC77B4AAF51E41F886A9 /* RadialGaugeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C382047C2277A8DADDCF22 /* RadialGaugeView.swift */; };
 		F72FC80493127C3CB35499F3 /* SignalRadarCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09035DC1A546A3CEB919703C /* SignalRadarCanvas.swift */; };
@@ -46,6 +47,7 @@
 		58C382047C2277A8DADDCF22 /* RadialGaugeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialGaugeView.swift; sourceTree = "<group>"; };
 		62C90B26B486E2052C4995C7 /* RoomSurveyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSurveyView.swift; sourceTree = "<group>"; };
 		781332F433DACDEB5B250D30 /* LiveHistoryGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveHistoryGraph.swift; sourceTree = "<group>"; };
+		7CFC835F94FF64B4EA0620D6 /* SignalBarsIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalBarsIndicator.swift; sourceTree = "<group>"; };
 		819DB88CCF4A3BB3BF4B7B03 /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = System/Library/Frameworks/Network.framework; sourceTree = SDKROOT; };
 		8FFDDDB58F3C0C76BD24130E /* WiFiSignal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WiFiSignal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9694D019AC802478B88288EA /* LocationPermissionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPermissionHelper.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				781332F433DACDEB5B250D30 /* LiveHistoryGraph.swift */,
 				27AC396450A297CD568C1F98 /* MetricCard.swift */,
 				58C382047C2277A8DADDCF22 /* RadialGaugeView.swift */,
+				7CFC835F94FF64B4EA0620D6 /* SignalBarsIndicator.swift */,
 				09035DC1A546A3CEB919703C /* SignalRadarCanvas.swift */,
 				D9C34D2CFBCAC8EAB5CA5BBE /* SpectrumBarChart.swift */,
 			);
@@ -253,6 +256,7 @@
 				010010BDA8F302353C4BFA8C /* RoomSurvey.swift in Sources */,
 				8B3D25C7D1D7169432916F73 /* RoomSurveyView.swift in Sources */,
 				DDEAD51D3AEA535F96543146 /* ScannedNetwork.swift in Sources */,
+				DDC1C08EF61CF0A369959A81 /* SignalBarsIndicator.swift in Sources */,
 				F72FC80493127C3CB35499F3 /* SignalRadarCanvas.swift in Sources */,
 				09CF6EE5CA933C8F9766E40A /* SpectrumBarChart.swift in Sources */,
 				FBF272F6FA95C6817D6682ED /* WiFiMetrics.swift in Sources */,

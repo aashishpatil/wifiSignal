@@ -20,12 +20,23 @@ public struct RadialGaugeView: View {
     public let score: Int
     public let rating: SignalRating
     public let rssi: Int
+    public let signalPercentage: Int?
+    public let signalBars: Int?
     public let isConnected: Bool
     
-    public init(score: Int, rating: SignalRating, rssi: Int, isConnected: Bool) {
+    public init(
+        score: Int,
+        rating: SignalRating,
+        rssi: Int,
+        signalPercentage: Int? = nil,
+        signalBars: Int? = nil,
+        isConnected: Bool
+    ) {
         self.score = score
         self.rating = rating
         self.rssi = rssi
+        self.signalPercentage = signalPercentage
+        self.signalBars = signalBars
         self.isConnected = isConnected
     }
     
@@ -67,24 +78,40 @@ public struct RadialGaugeView: View {
                 .animation(.easeInOut(duration: 0.4), value: progress)
             
             // Center Metrics Text
-            VStack(spacing: 4) {
+            VStack(spacing: 3) {
                 if isConnected {
                     Text("\(score)")
-                        .font(.system(size: 46, weight: .bold, design: .rounded))
+                        .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     
                     Text(rating.rawValue.uppercased())
-                        .font(.system(size: 11, weight: .heavy, design: .monospaced))
+                        .font(.system(size: 10, weight: .heavy, design: .monospaced))
                         .foregroundColor(rating.color)
-                        .padding(.horizontal, 8)
+                        .padding(.horizontal, 7)
                         .padding(.vertical, 2)
                         .background(rating.color.opacity(0.18))
                         .clipShape(Capsule())
                     
-                    Text("\(rssi) dBm")
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.65))
-                        .padding(.top, 2)
+                    HStack(spacing: 4) {
+                        if let bars = signalBars {
+                            SignalBarsIndicator(
+                                bars: bars,
+                                color: rating.color,
+                                barWidth: 3.0,
+                                maxHeight: 11.0,
+                                spacing: 2.0
+                            )
+                        }
+                        if let pct = signalPercentage {
+                            Text("\(pct)%")
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                        }
+                        Text("(\(rssi) dBm)")
+                            .font(.system(size: 10, weight: .medium, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.65))
+                    }
+                    .padding(.top, 2)
                 } else {
                     Image(systemName: "wifi.slash")
                         .font(.system(size: 38))

@@ -44,7 +44,7 @@ public final class OptimizationEngine {
                     title: "Severe Distance / Wall Attenuation",
                     category: .placement,
                     severity: .critical,
-                    diagnosis: "Signal strength is at \(metrics.rssi) dBm, which is near the disconnect threshold. Radio waves are heavily attenuated by concrete walls, metal fixtures, or distance.",
+                    diagnosis: "Signal strength is at \(metrics.signalPercentage)% (\(metrics.rssi) dBm), which is near the disconnect threshold. Radio waves are heavily attenuated by concrete walls, metal fixtures, or distance.",
                     actionPlan: "Move your router to a central, elevated position (e.g. on top of a bookshelf, not in a cabinet or on the floor). If your home has multiple stories, consider a dedicated Wi-Fi 6 mesh node."
                 )
             )
@@ -54,7 +54,7 @@ public final class OptimizationEngine {
                     title: "Moderate Range Degradation",
                     category: .placement,
                     severity: .warning,
-                    diagnosis: "Current signal is \(metrics.rssi) dBm. While adequate for basic web browsing, link modulation drops and speeds fluctuate.",
+                    diagnosis: "Current signal is \(metrics.signalPercentage)% (\(metrics.rssi) dBm). While adequate for basic web browsing, link modulation drops and speeds fluctuate.",
                     actionPlan: "Ensure line-of-sight between rooms is unobstructed. Elevate the router above furniture to prevent ground-level signal bounce."
                 )
             )
@@ -64,7 +64,7 @@ public final class OptimizationEngine {
                     title: "Strong Physical Proximity",
                     category: .placement,
                     severity: .optimal,
-                    diagnosis: "Current signal strength is strong (\(metrics.rssi) dBm). The distance and line-of-sight to the router at this location are excellent.",
+                    diagnosis: "Current signal strength is strong at \(metrics.signalPercentage)% (\(metrics.rssi) dBm). The distance and line-of-sight to the router at this location are excellent.",
                     actionPlan: "This position provides ideal RF reception. Use this spot as a benchmark when testing other rooms."
                 )
             )

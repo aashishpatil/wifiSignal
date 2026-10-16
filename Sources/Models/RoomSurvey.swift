@@ -91,4 +91,21 @@ public struct RoomSurveyPoint: Identifiable, Codable, Equatable {
             return "Dead zone; needs router repositioning or mesh node"
         }
     }
+    
+    public var signalPercentage: Int {
+        guard rssi != 0 else { return 0 }
+        let norm = (Double(rssi) - (-90.0)) / ((-50.0) - (-90.0)) * 100.0
+        return max(0, min(100, Int(norm.rounded())))
+    }
+    
+    public var rssiBars: Int {
+        guard rssi != 0 else { return 0 }
+        switch rssi {
+        case -55...0: return 4
+        case -67 ..< -55: return 3
+        case -77 ..< -67: return 2
+        case -88 ..< -77: return 1
+        default: return 0
+        }
+    }
 }

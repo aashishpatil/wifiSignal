@@ -269,6 +269,38 @@ public struct WiFiMetrics: Identifiable, Equatable {
         }
     }
     
+    /// User-friendly 0-100% signal strength derived directly from RSSI (-90 dBm to -50 dBm)
+    public var signalPercentage: Int {
+        guard isConnected, rssi != 0 else { return 0 }
+        let norm = (Double(rssi) - (-90.0)) / ((-50.0) - (-90.0)) * 100.0
+        return max(0, min(100, Int(norm.rounded())))
+    }
+    
+    /// Signal strength bars (0 to 4) mapped directly to RSSI thresholds
+    public var rssiBars: Int {
+        guard isConnected, rssi != 0 else { return 0 }
+        switch rssi {
+        case -55...0: return 4
+        case -67 ..< -55: return 3
+        case -77 ..< -67: return 2
+        case -88 ..< -77: return 1
+        default: return 0
+        }
+    }
+    
+    /// Human-understandable qualitative description of the RSSI number
+    public var rssiHumanRating: String {
+        guard isConnected, rssi != 0 else { return "Disconnected" }
+        switch rssi {
+        case -50...0: return "Maximum (Near Router)"
+        case -59 ..< -50: return "Very Strong (Same Room)"
+        case -69 ..< -59: return "Good (1-2 Walls)"
+        case -79 ..< -69: return "Fair (Distance / Obstacles)"
+        case -89 ..< -79: return "Weak (Fringe Coverage)"
+        default: return "Dead Zone (Fringe)"
+        }
+    }
+    
     public var humanDescription: String {
         guard isConnected else { return "Disconnected from Wi-Fi" }
         switch rating {

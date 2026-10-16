@@ -118,10 +118,17 @@ public struct RoomSurveyView: View {
             
             // Live Preview of Current Readings
             HStack(spacing: 16) {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Text("Current Live Signal:")
                         .foregroundColor(.white.opacity(0.6))
-                    Text("\(monitor.currentMetrics.rssi) dBm")
+                    SignalBarsIndicator(
+                        bars: monitor.currentMetrics.rssiBars,
+                        color: monitor.currentMetrics.rating.color,
+                        barWidth: 2.5,
+                        maxHeight: 12,
+                        spacing: 1.5
+                    )
+                    Text("\(monitor.currentMetrics.signalPercentage)% (\(monitor.currentMetrics.rssi) dBm)")
                         .font(.system(size: 12, weight: .bold, design: .monospaced))
                         .foregroundColor(monitor.currentMetrics.rating.color)
                 }
@@ -205,7 +212,7 @@ public struct RoomSurveyView: View {
                     Text(best.roomName)
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.green)
-                    Text("\(best.rssi) dBm • Grade \(best.grade)")
+                    Text("\(best.signalPercentage)% (\(best.rssi) dBm) • Grade \(best.grade)")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -220,7 +227,7 @@ public struct RoomSurveyView: View {
                     Text(worst.roomName)
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(worst.qualityScore < 60 ? .red : .yellow)
-                    Text("\(worst.rssi) dBm • Grade \(worst.grade)")
+                    Text("\(worst.signalPercentage)% (\(worst.rssi) dBm) • Grade \(worst.grade)")
                         .font(.system(size: 11, design: .monospaced))
                         .foregroundColor(.white.opacity(0.7))
                 }
@@ -318,13 +325,22 @@ public struct RoomSurveyView: View {
             Spacer()
             
             VStack(alignment: .trailing, spacing: 2) {
-                Text("\(pt.rssi) dBm")
-                    .font(.system(size: 13, weight: .bold, design: .monospaced))
-                    .foregroundColor(pt.gradeColor)
+                HStack(spacing: 5) {
+                    SignalBarsIndicator(
+                        bars: pt.rssiBars,
+                        color: pt.gradeColor,
+                        barWidth: 2,
+                        maxHeight: 11,
+                        spacing: 1.5
+                    )
+                    Text("\(pt.signalPercentage)%")
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(pt.gradeColor)
+                }
                 
-                Text("\(pt.snr) dB SNR • \(String(format: "%.1f ms", pt.latencyMs))")
+                Text("\(pt.rssi) dBm • \(pt.snr) dB SNR")
                     .font(.system(size: 10, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.5))
+                    .foregroundColor(.white.opacity(0.55))
             }
         }
         .padding(.horizontal, 14)

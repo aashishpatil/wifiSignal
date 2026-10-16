@@ -25,6 +25,8 @@ public struct MetricCard: View {
     public var isHighlighted: Bool = false
     public var badge: String? = nil
     public var badgeColor: Color? = nil
+    public var signalBars: Int? = nil
+    public var progressBarValue: Double? = nil
     
     public init(
         title: String,
@@ -34,7 +36,9 @@ public struct MetricCard: View {
         accentColor: Color,
         isHighlighted: Bool = false,
         badge: String? = nil,
-        badgeColor: Color? = nil
+        badgeColor: Color? = nil,
+        signalBars: Int? = nil,
+        progressBarValue: Double? = nil
     ) {
         self.title = title
         self.value = value
@@ -44,6 +48,8 @@ public struct MetricCard: View {
         self.isHighlighted = isHighlighted
         self.badge = badge
         self.badgeColor = badgeColor
+        self.signalBars = signalBars
+        self.progressBarValue = progressBarValue
     }
     
     public var body: some View {
@@ -61,12 +67,16 @@ public struct MetricCard: View {
                     .shadow(color: accentColor.opacity(0.8), radius: 3)
             }
             
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 Text(value)
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+                
+                if let bars = signalBars {
+                    SignalBarsIndicator(bars: bars, color: accentColor)
+                }
                 
                 if let badge = badge {
                     let bColor = badgeColor ?? accentColor
@@ -80,10 +90,25 @@ public struct MetricCard: View {
                 }
             }
             
+            if let progress = progressBarValue {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.12))
+                            .frame(height: 3)
+                        Capsule()
+                            .fill(accentColor)
+                            .frame(width: max(0, min(geo.size.width, geo.size.width * CGFloat(progress))), height: 3)
+                    }
+                }
+                .frame(height: 3)
+            }
+            
             Text(subtitle)
                 .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundColor(.white.opacity(0.55))
-                .lineLimit(1)
+                .foregroundColor(.white.opacity(0.65))
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
         }
         .padding(12)
         .background(

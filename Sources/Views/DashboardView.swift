@@ -177,6 +177,8 @@ public struct DashboardView: View {
                     score: monitor.currentMetrics.qualityScore,
                     rating: monitor.currentMetrics.rating,
                     rssi: monitor.currentMetrics.rssi,
+                    signalPercentage: monitor.currentMetrics.signalPercentage,
+                    signalBars: monitor.currentMetrics.rssiBars,
                     isConnected: monitor.currentMetrics.isConnected
                 )
             }
@@ -232,14 +234,20 @@ public struct DashboardView: View {
             GridItem(.flexible(), spacing: 12),
             GridItem(.flexible(), spacing: 12)
         ], spacing: 12) {
-            // 1. Signal RSSI
+            // 1. Signal Strength (Percentage + Graphical Bars + Explained dBm)
+            let pct = monitor.currentMetrics.signalPercentage
+            let humanDesc = monitor.currentMetrics.rssiHumanRating
             MetricCard(
-                title: "Signal Strength (RSSI)",
-                value: "\(monitor.currentMetrics.rssi) dBm",
-                subtitle: monitor.currentMetrics.rating.rawValue + " range",
+                title: "Signal Strength",
+                value: "\(pct)%",
+                subtitle: "\(monitor.currentMetrics.rssi) dBm • \(humanDesc)",
                 systemImage: "antenna.radiowaves.left.and.right",
                 accentColor: monitor.currentMetrics.rating.color,
-                isHighlighted: true
+                isHighlighted: true,
+                badge: "\(monitor.currentMetrics.rssiBars)/4 BARS",
+                badgeColor: monitor.currentMetrics.rating.color,
+                signalBars: monitor.currentMetrics.rssiBars,
+                progressBarValue: Double(pct) / 100.0
             )
             
             // 2. Connected Channel & Band

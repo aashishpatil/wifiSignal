@@ -401,11 +401,26 @@ public struct ChannelSpectrumView: View {
             }
             .frame(width: 170, alignment: .trailing)
             
-            // RSSI
-            Text("\(net.rssi) dBm")
-                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                .foregroundColor(net.signalColor)
-                .frame(width: 70, alignment: .trailing)
+            // RSSI & Signal Bars
+            HStack(spacing: 6) {
+                SignalBarsIndicator(
+                    bars: net.rssiBars,
+                    color: net.signalColor,
+                    barWidth: 2.5,
+                    maxHeight: 12,
+                    spacing: 1.5
+                )
+                
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text("\(net.signalPercentage)%")
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundColor(net.signalColor)
+                    Text("\(net.rssi) dBm")
+                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+            }
+            .frame(width: 85, alignment: .trailing)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

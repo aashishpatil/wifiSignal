@@ -86,16 +86,32 @@ public struct MainView: View {
                         .foregroundColor(.white)
                         .lineLimit(1)
                     
-                    Text("\(monitor.currentMetrics.rssi) dBm • Ch \(monitor.currentMetrics.channelNumber)")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.6))
+                    if monitor.currentMetrics.isConnected {
+                        Text("\(monitor.currentMetrics.signalPercentage)% (\(monitor.currentMetrics.rssi) dBm) • Ch \(monitor.currentMetrics.channelNumber)")
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.6))
+                    } else {
+                        Text("Not Connected")
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                    }
                 }
                 
                 Spacer()
                 
-                Text("\(monitor.currentMetrics.qualityScore)%")
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundColor(monitor.currentMetrics.rating.color)
+                HStack(spacing: 6) {
+                    SignalBarsIndicator(
+                        bars: monitor.currentMetrics.rssiBars,
+                        color: monitor.currentMetrics.rating.color,
+                        barWidth: 2.5,
+                        maxHeight: 12,
+                        spacing: 2
+                    )
+                    
+                    Text("\(monitor.currentMetrics.qualityScore)%")
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .foregroundColor(monitor.currentMetrics.rating.color)
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
