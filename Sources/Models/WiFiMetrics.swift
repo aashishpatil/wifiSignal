@@ -78,6 +78,65 @@ public enum SignalRating: String, CaseIterable {
     }
 }
 
+public enum RegulatorySubband: String, CaseIterable, Identifiable {
+    case unii1 = "UNII-1 (Non-DFS)"
+    case unii2A = "UNII-2A (DFS)"
+    case unii2C = "UNII-2C (DFS)"
+    case unii3 = "UNII-3 (Non-DFS)"
+    case unii4 = "UNII-4 (Non-DFS)"
+    case ghz24 = "2.4 GHz ISM"
+    case ghz6 = "6 GHz UNII-5..8"
+    case unknown = "Unknown"
+    
+    public var id: String { rawValue }
+    
+    public var isDFS: Bool {
+        return self == .unii2A || self == .unii2C
+    }
+    
+    public var shortName: String {
+        switch self {
+        case .unii1: return "UNII-1"
+        case .unii2A: return "UNII-2A (DFS)"
+        case .unii2C: return "UNII-2C (DFS)"
+        case .unii3: return "UNII-3"
+        case .unii4: return "UNII-4"
+        case .ghz24: return "2.4G"
+        case .ghz6: return "6G"
+        case .unknown: return "Unknown"
+        }
+    }
+    
+    public static func from(channelNumber: Int, band: ChannelBand) -> RegulatorySubband {
+        switch band {
+        case .band2GHz:
+            return .ghz24
+        case .band5GHz:
+            switch channelNumber {
+            case 36...48:
+                return .unii1
+            case 52...64:
+                return .unii2A
+            case 100...144:
+                return .unii2C
+            case 149...165:
+                return .unii3
+            case 168...177:
+                return .unii4
+            default:
+                if (52...64).contains(channelNumber) || (100...144).contains(channelNumber) {
+                    return .unii2A
+                }
+                return .unknown
+            }
+        case .band6GHz:
+            return .ghz6
+        case .unknown:
+            return .unknown
+        }
+    }
+}
+
 public struct WiFiMetrics: Identifiable, Equatable {
     public let id = UUID()
     public var timestamp: Date = Date()
@@ -94,6 +153,8 @@ public struct WiFiMetrics: Identifiable, Equatable {
     public var channelNumber: Int = 0
     public var channelBand: ChannelBand = .unknown
     public var channelWidth: ChannelWidth = .unknown
+    public var isDFS: Bool = false
+    public var regulatorySubband: RegulatorySubband = .unknown
     public var transmitRate: Double = 0.0  // Mbps
     
     // Gateway telemetry
@@ -112,6 +173,8 @@ public struct WiFiMetrics: Identifiable, Equatable {
         channelNumber: Int = 0,
         channelBand: ChannelBand = .unknown,
         channelWidth: ChannelWidth = .unknown,
+        isDFS: Bool? = nil,
+        regulatorySubband: RegulatorySubband? = nil,
         transmitRate: Double = 0.0,
         gatewayIP: String? = nil,
         gatewayLatencyMs: Double? = nil,
@@ -127,6 +190,9 @@ public struct WiFiMetrics: Identifiable, Equatable {
         self.channelNumber = channelNumber
         self.channelBand = channelBand
         self.channelWidth = channelWidth
+        let computedSubband = regulatorySubband ?? RegulatorySubband.from(channelNumber: channelNumber, band: channelBand)
+        self.regulatorySubband = computedSubband
+        self.isDFS = isDFS ?? computedSubband.isDFS
         self.transmitRate = transmitRate
         self.gatewayIP = gatewayIP
         self.gatewayLatencyMs = gatewayLatencyMs

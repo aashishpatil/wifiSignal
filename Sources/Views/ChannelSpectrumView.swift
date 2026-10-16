@@ -76,80 +76,147 @@ public struct ChannelSpectrumView: View {
     }
     
     private var channelRecommendationSection: some View {
-        HStack(spacing: 14) {
-            // 2.4 GHz Recommendation
-            let best24 = bestChannelFor(band: .band2GHz, candidates: [1, 6, 11])
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Label("Best 2.4 GHz Channel", systemImage: "waveform")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.orange)
-                    Spacer()
-                    Text("Channels 1, 6, 11")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.4))
+        VStack(spacing: 12) {
+            HStack(spacing: 14) {
+                // 2.4 GHz Recommendation
+                let best24 = bestChannelFor(band: .band2GHz, candidates: [1, 6, 11])
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Label("Best 2.4 GHz", systemImage: "waveform")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.orange)
+                        Spacer()
+                        Text("1, 6, 11")
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.4))
+                    }
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text("Ch \(best24.ch)")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                        Text("(\(best24.count) APs)")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.green)
+                    }
+                    
+                    Text(best24.count == 0 ? "Zero interference detected." : "Lowest congestion non-overlapping channel.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.7))
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(white: 0.12).opacity(0.7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                        )
+                )
                 
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("Channel \(best24.ch)")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    Text("(\(best24.count) APs)")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(.green)
+                // 5 GHz Non-DFS Recommendation
+                let best5NonDFS = bestChannelFor(band: .band5GHz, candidates: [36, 40, 44, 48, 149, 153, 157, 161])
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Label("Best 5 GHz Standard", systemImage: "shield.slash")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.cyan)
+                        Spacer()
+                        Text("Non-DFS")
+                            .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                            .foregroundColor(.cyan)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(Color.cyan.opacity(0.15))
+                            .clipShape(Capsule())
+                    }
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text("Ch \(best5NonDFS.ch)")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                        Text("(\(best5NonDFS.count) APs)")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.green)
+                    }
+                    
+                    Text("Safe for all IoT devices with zero radar CAC disconnects.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.7))
                 }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(white: 0.12).opacity(0.7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.cyan.opacity(0.3), lineWidth: 1)
+                        )
+                )
                 
-                Text(best24.count == 0 ? "Zero interference detected on this channel." : "Lowest congestion among non-overlapping 2.4GHz channels.")
-                    .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.7))
+                // 5 GHz DFS Recommendation
+                let best5DFS = bestChannelFor(band: .band5GHz, candidates: [52, 56, 60, 64, 100, 104, 108, 112, 116, 132, 136, 140])
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Label("Best 5 GHz DFS", systemImage: "sparkles")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(Color(red: 0.8, green: 0.55, blue: 1.0))
+                        Spacer()
+                        Text("DFS Clean")
+                            .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                            .foregroundColor(Color(red: 0.8, green: 0.55, blue: 1.0))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(Color.purple.opacity(0.18))
+                            .clipShape(Capsule())
+                    }
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text("Ch \(best5DFS.ch)")
+                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                        Text("(\(best5DFS.count) APs)")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(.green)
+                    }
+                    
+                    Text("Uncrowded spectrum for maximum 80/160MHz bandwidth.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(white: 0.12).opacity(0.7))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                        )
+                )
             }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.12).opacity(0.7))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
-                    )
-            )
             
-            // 5 GHz Recommendation
-            let best5 = bestChannelFor(band: .band5GHz, candidates: [36, 44, 48, 149, 157, 161])
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Label("Best 5 GHz Channel", systemImage: "bolt.fill")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.cyan)
-                    Spacer()
-                    Text("Wider Bandwidth")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.white.opacity(0.4))
-                }
+            // DFS Informational Guide
+            HStack(spacing: 12) {
+                Image(systemName: "info.circle.fill")
+                    .foregroundColor(Color(red: 0.8, green: 0.55, blue: 1.0))
+                    .font(.system(size: 16))
                 
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("Channel \(best5.ch)")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Understanding DFS (Dynamic Frequency Selection)")
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.white)
-                    Text("(\(best5.count) APs)")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(.green)
+                    Text("Channels 52–144 share frequencies with weather and military radar. If radar is detected, routers must temporarily vacate the channel. DFS provides pristine, uncrowded airtime, but verify that legacy smart home devices support it.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.white.opacity(0.65))
                 }
-                
-                Text(best5.count == 0 ? "Clean frequency slot. Maximum throughput for 80/160MHz width." : "Least occupied 5GHz channel in your area.")
-                    .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.7))
             }
-            .padding(12)
+            .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.12).opacity(0.7))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.cyan.opacity(0.3), lineWidth: 1)
-                    )
-            )
+            .background(Color.purple.opacity(0.08))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
     
@@ -239,14 +306,25 @@ public struct ChannelSpectrumView: View {
             
             // Channel & Band
             VStack(alignment: .trailing, spacing: 2) {
-                Text("Ch \(net.channelNumber) (\(net.channelBand.rawValue))")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.white.opacity(0.9))
-                Text(net.channelWidth.rawValue)
+                HStack(spacing: 4) {
+                    if net.isDFS {
+                        Text("DFS")
+                            .font(.system(size: 8, weight: .heavy, design: .monospaced))
+                            .foregroundColor(Color(red: 0.8, green: 0.55, blue: 1.0))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .background(Color.purple.opacity(0.2))
+                            .clipShape(RoundedRectangle(cornerRadius: 2))
+                    }
+                    Text("Ch \(net.channelNumber) (\(net.channelBand.rawValue))")
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.9))
+                }
+                Text("\(net.channelWidth.rawValue) • \(net.regulatorySubband.shortName)")
                     .font(.system(size: 10, design: .monospaced))
                     .foregroundColor(.white.opacity(0.5))
             }
-            .frame(width: 140, alignment: .trailing)
+            .frame(width: 170, alignment: .trailing)
             
             // RSSI
             Text("\(net.rssi) dBm")

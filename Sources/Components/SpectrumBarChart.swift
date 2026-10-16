@@ -56,6 +56,25 @@ public struct SpectrumBarChart: View {
                 .frame(width: 180)
             }
             
+            // Legend
+            HStack(spacing: 14) {
+                HStack(spacing: 4) {
+                    Circle().fill(Color.cyan).frame(width: 6, height: 6)
+                    Text("Your Network").font(.system(size: 10)).foregroundColor(.white.opacity(0.7))
+                }
+                HStack(spacing: 4) {
+                    Circle().fill(Color.orange).frame(width: 6, height: 6)
+                    Text("Neighbor APs").font(.system(size: 10)).foregroundColor(.white.opacity(0.7))
+                }
+                if selectedBand == .band5GHz {
+                    HStack(spacing: 4) {
+                        RoundedRectangle(cornerRadius: 2).fill(Color(red: 0.75, green: 0.55, blue: 1.0)).frame(width: 8, height: 8)
+                        Text("DFS Channels (52–144)").font(.system(size: 10)).foregroundColor(.white.opacity(0.7))
+                    }
+                }
+            }
+            .padding(.horizontal, 4)
+            
             // Spectrum Canvas / Bar View
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
@@ -90,7 +109,7 @@ public struct SpectrumBarChart: View {
                     }
                 }
             }
-            .frame(height: 220)
+            .frame(height: 235)
         }
     }
     
@@ -103,7 +122,11 @@ public struct SpectrumBarChart: View {
             ZStack(alignment: .bottom) {
                 // Background channel lane
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.white.opacity(0.04))
+                    .fill(util.isDFS ? Color.purple.opacity(0.08) : Color.white.opacity(0.04))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(util.isDFS ? Color.purple.opacity(0.3) : Color.clear, lineWidth: 1)
+                    )
                     .frame(width: 48, height: 140)
                 
                 // Stack of networks broadcasting on this channel
@@ -129,11 +152,23 @@ public struct SpectrumBarChart: View {
                 }
             }
             
-            // Channel Number Pill
-            VStack(spacing: 2) {
-                Text("Ch \(util.channelNumber)")
-                    .font(.system(size: 11, weight: isConnectedCh ? .bold : .medium, design: .monospaced))
-                    .foregroundColor(isConnectedCh ? .cyan : .white.opacity(0.8))
+            // Channel Number Pill + DFS badge
+            VStack(spacing: 3) {
+                HStack(spacing: 2) {
+                    Text("Ch \(util.channelNumber)")
+                        .font(.system(size: 11, weight: isConnectedCh ? .bold : .medium, design: .monospaced))
+                        .foregroundColor(isConnectedCh ? .cyan : .white.opacity(0.8))
+                }
+                
+                if util.isDFS {
+                    Text("DFS")
+                        .font(.system(size: 7, weight: .heavy, design: .monospaced))
+                        .foregroundColor(Color(red: 0.8, green: 0.55, blue: 1.0))
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(Color(red: 0.8, green: 0.55, blue: 1.0).opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 2))
+                }
                 
                 if isConnectedCh {
                     Text("ACTIVE")

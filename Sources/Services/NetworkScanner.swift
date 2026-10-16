@@ -54,6 +54,8 @@ public final class NetworkScanner: ObservableObject {
                     let band = net.wlanChannel != nil ? ChannelBand.from(cwBand: net.wlanChannel!.channelBand) : .unknown
                     let width = net.wlanChannel != nil ? ChannelWidth.from(cwWidth: net.wlanChannel!.channelWidth) : .unknown
                     let isCurrent = (ssid == currentSSID && chNum == currentChannel)
+                    let isDFS = net.wlanChannel?.description.contains("DFS") ?? ((52...64).contains(chNum) || (100...144).contains(chNum))
+                    let subband = RegulatorySubband.from(channelNumber: chNum, band: band)
                     
                     let scanned = ScannedNetwork(
                         ssid: ssid,
@@ -62,6 +64,8 @@ public final class NetworkScanner: ObservableObject {
                         channelNumber: chNum,
                         channelBand: band,
                         channelWidth: width,
+                        isDFS: isDFS,
+                        regulatorySubband: subband,
                         beaconInterval: net.beaconInterval,
                         isCurrentNetwork: isCurrent
                     )

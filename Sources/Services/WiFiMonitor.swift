@@ -110,6 +110,7 @@ public final class WiFiMonitor: ObservableObject {
         let bssidAddr = iface.bssid()
         
         let isAssociated = (rssiVal != 0 && chNum != 0)
+        let isDFSChannel = ch?.description.contains("DFS") ?? false
         
         let updated = WiFiMetrics(
             isConnected: isAssociated,
@@ -121,6 +122,7 @@ public final class WiFiMonitor: ObservableObject {
             channelNumber: chNum,
             channelBand: chBand,
             channelWidth: chWidth,
+            isDFS: isDFSChannel,
             transmitRate: txRate,
             gatewayIP: prober.currentGatewayIP,
             gatewayLatencyMs: prober.latestLatencyMs,

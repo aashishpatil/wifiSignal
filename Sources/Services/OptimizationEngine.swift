@@ -107,6 +107,29 @@ public final class OptimizationEngine {
             )
         }
         
+        // DFS Channel Assessment
+        if metrics.isDFS {
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "DFS Channel Active (\(metrics.regulatorySubband.shortName))",
+                    category: .channel,
+                    severity: .optimal,
+                    diagnosis: "Operating on DFS Channel \(metrics.channelNumber). DFS frequencies enjoy substantially cleaner spectrum with minimal neighbor clutter.",
+                    actionPlan: "Note: In the event of nearby airport/weather radar detection, your router may temporarily channel-hop. Ensure legacy IoT devices support DFS."
+                )
+            )
+        } else if metrics.channelBand == .band5GHz && neighborCount >= 2 {
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "Consider Migrating to a DFS Channel",
+                    category: .channel,
+                    severity: .tip,
+                    diagnosis: "Your Non-DFS 5GHz Channel (\(metrics.channelNumber)) is sharing airtime with \(neighborCount) neighboring routers.",
+                    actionPlan: "Switch your router's 5GHz band to an open DFS channel (e.g. 52-64 or 100-144) to escape consumer congestion."
+                )
+            )
+        }
+        
         // 3. Band Selection (2.4 GHz vs 5 GHz / 6 GHz)
         if metrics.channelBand == .band2GHz {
             adviceList.append(

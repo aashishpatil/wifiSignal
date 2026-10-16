@@ -23,6 +23,8 @@ public struct MetricCard: View {
     public let systemImage: String
     public let accentColor: Color
     public var isHighlighted: Bool = false
+    public var badge: String? = nil
+    public var badgeColor: Color? = nil
     
     public init(
         title: String,
@@ -30,7 +32,9 @@ public struct MetricCard: View {
         subtitle: String,
         systemImage: String,
         accentColor: Color,
-        isHighlighted: Bool = false
+        isHighlighted: Bool = false,
+        badge: String? = nil,
+        badgeColor: Color? = nil
     ) {
         self.title = title
         self.value = value
@@ -38,6 +42,8 @@ public struct MetricCard: View {
         self.systemImage = systemImage
         self.accentColor = accentColor
         self.isHighlighted = isHighlighted
+        self.badge = badge
+        self.badgeColor = badgeColor
     }
     
     public var body: some View {
@@ -55,11 +61,24 @@ public struct MetricCard: View {
                     .shadow(color: accentColor.opacity(0.8), radius: 3)
             }
             
-            Text(value)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundColor(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+            HStack(spacing: 6) {
+                Text(value)
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                
+                if let badge = badge {
+                    let bColor = badgeColor ?? accentColor
+                    Text(badge)
+                        .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                        .foregroundColor(bColor)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
+                        .background(bColor.opacity(0.18))
+                        .clipShape(Capsule())
+                }
+            }
             
             Text(subtitle)
                 .font(.system(size: 10, weight: .medium, design: .monospaced))

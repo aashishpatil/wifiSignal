@@ -245,13 +245,16 @@ public struct DashboardView: View {
             // 2. Connected Channel & Band
             let bandStr = monitor.currentMetrics.channelBand.rawValue
             let widthStr = monitor.currentMetrics.channelWidth.rawValue
+            let subbandStr = monitor.currentMetrics.regulatorySubband != .unknown ? monitor.currentMetrics.regulatorySubband.shortName : ""
             MetricCard(
                 title: "Connected Channel",
                 value: "Ch \(monitor.currentMetrics.channelNumber)",
-                subtitle: "\(bandStr) • \(widthStr)",
+                subtitle: "\(bandStr) • \(widthStr)\(subbandStr.isEmpty ? "" : " • \(subbandStr)")",
                 systemImage: "point.3.connected.trianglepath.dotted",
-                accentColor: .cyan,
-                isHighlighted: true
+                accentColor: monitor.currentMetrics.isDFS ? Color(red: 0.75, green: 0.55, blue: 1.0) : .cyan,
+                isHighlighted: true,
+                badge: monitor.currentMetrics.channelBand == .band5GHz ? (monitor.currentMetrics.isDFS ? "DFS" : "NON-DFS") : nil,
+                badgeColor: monitor.currentMetrics.isDFS ? Color(red: 0.8, green: 0.5, blue: 1.0) : Color.cyan
             )
             
             // 3. Noise Floor & SNR

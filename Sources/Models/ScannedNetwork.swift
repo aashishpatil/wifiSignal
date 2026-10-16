@@ -26,6 +26,8 @@ public struct ScannedNetwork: Identifiable, Equatable {
     public let channelNumber: Int
     public let channelBand: ChannelBand
     public let channelWidth: ChannelWidth
+    public let isDFS: Bool
+    public let regulatorySubband: RegulatorySubband
     public let beaconInterval: Int
     public let isCurrentNetwork: Bool
     
@@ -36,6 +38,8 @@ public struct ScannedNetwork: Identifiable, Equatable {
         channelNumber: Int,
         channelBand: ChannelBand,
         channelWidth: ChannelWidth,
+        isDFS: Bool? = nil,
+        regulatorySubband: RegulatorySubband? = nil,
         beaconInterval: Int = 100,
         isCurrentNetwork: Bool = false
     ) {
@@ -46,6 +50,9 @@ public struct ScannedNetwork: Identifiable, Equatable {
         self.channelNumber = channelNumber
         self.channelBand = channelBand
         self.channelWidth = channelWidth
+        let sub = regulatorySubband ?? RegulatorySubband.from(channelNumber: channelNumber, band: channelBand)
+        self.regulatorySubband = sub
+        self.isDFS = isDFS ?? sub.isDFS
         self.beaconInterval = beaconInterval
         self.isCurrentNetwork = isCurrentNetwork
     }
@@ -75,6 +82,14 @@ public struct ChannelUtilization: Identifiable {
     public let band: ChannelBand
     public var networks: [ScannedNetwork]
     public var isCurrentChannel: Bool
+    
+    public var isDFS: Bool {
+        return band == .band5GHz && ((52...64).contains(channelNumber) || (100...144).contains(channelNumber))
+    }
+    
+    public var regulatorySubband: RegulatorySubband {
+        return RegulatorySubband.from(channelNumber: channelNumber, band: band)
+    }
     
     public var totalInterferenceScore: Double {
         // Sum of neighbor signal power
