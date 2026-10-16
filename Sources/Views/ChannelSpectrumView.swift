@@ -77,6 +77,73 @@ public struct ChannelSpectrumView: View {
     
     private var channelRecommendationSection: some View {
         VStack(spacing: 12) {
+            // Bandwidth & Speed Protection Notice (Prevents accidental speed drops)
+            if monitor.currentMetrics.channelWidth == .width160MHz {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "bolt.shield.fill")
+                        .foregroundColor(.green)
+                        .font(.system(size: 24))
+                        .padding(8)
+                        .background(Color.green.opacity(0.15))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text("160 MHz Ultrawide Active — High Speed Protected")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(.white)
+                            Spacer()
+                            Text("RECOMMENDED: KEEP AUTO")
+                                .font(.system(size: 9, weight: .heavy, design: .monospaced))
+                                .foregroundColor(.green)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.green.opacity(0.18))
+                                .clipShape(Capsule())
+                        }
+                        
+                        Text("Your connection is currently bonding 8 channels together (160 MHz) delivering a negotiated PHY link rate of \(Int(monitor.currentMetrics.transmitRate)) Mbps.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.white.opacity(0.85))
+                        
+                        Text("⚠️ Do NOT switch to an individual uncongested channel unless your router supports 160 MHz bonding on it! Switching channels away from Auto often forces routers to shrink bandwidth to 20/40 MHz, causing throughput to collapse from 500+ Mbps down to <100 Mbps.")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.3))
+                            .padding(.top, 2)
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(white: 0.12).opacity(0.85))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.green.opacity(0.4), lineWidth: 1)
+                        )
+                )
+            } else if monitor.currentMetrics.channelWidth == .width80MHz {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.cyan)
+                        .font(.system(size: 20))
+                        .padding(6)
+                        .background(Color.cyan.opacity(0.15))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("80 MHz Wideband Active (\(Int(monitor.currentMetrics.transmitRate)) Mbps)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.white)
+                        Text("If you manually select an uncongested channel, ensure your router settings keep 80 MHz channel width enabled so speed does not drop to 20 MHz.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.white.opacity(0.75))
+                    }
+                }
+                .padding(10)
+                .background(Color.cyan.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            
             HStack(spacing: 14) {
                 // 2.4 GHz Recommendation
                 let best24 = bestChannelFor(band: .band2GHz, candidates: [1, 6, 11])
@@ -141,9 +208,13 @@ public struct ChannelSpectrumView: View {
                             .foregroundColor(.green)
                     }
                     
-                    Text("Safe for all IoT devices with zero radar CAC disconnects.")
+                    Text("Guaranteed IoT compatibility with zero radar CAC disconnects.")
                         .font(.system(size: 10))
                         .foregroundColor(.white.opacity(0.7))
+                    
+                    Text("⚠️ Avoid Ch 165 (capped at 20MHz).")
+                        .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.orange)
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -185,6 +256,10 @@ public struct ChannelSpectrumView: View {
                     Text("Uncrowded spectrum for maximum 80/160MHz bandwidth.")
                         .font(.system(size: 10))
                         .foregroundColor(.white.opacity(0.7))
+                    
+                    Text("Anchors 160MHz Block 2 (Ch 100–128).")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundColor(.white.opacity(0.5))
                 }
                 .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)

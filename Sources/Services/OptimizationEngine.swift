@@ -143,6 +143,30 @@ public final class OptimizationEngine {
             )
         }
         
+        // 4. High Bandwidth (160MHz / 80MHz) Channel Switching Protection
+        if metrics.channelWidth == .width160MHz {
+            adviceList.insert(
+                OptimizationAdvice(
+                    title: "160 MHz Ultrawide Active — Keep Auto",
+                    category: .bandwidth,
+                    severity: .optimal,
+                    diagnosis: "Your connection is bonding 8 channels for 160 MHz bandwidth with a high link rate of \(Int(metrics.transmitRate)) Mbps.",
+                    actionPlan: "Do NOT manually change to an isolated channel. Manually overriding Auto often forces routers down to 20/40 MHz, dropping throughput from 500+ Mbps to <100 Mbps. Stick to Auto to preserve 160 MHz speeds."
+                ),
+                at: 0
+            )
+        } else if metrics.channelWidth == .width80MHz && metrics.transmitRate >= 600 {
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "80 MHz Wideband Active",
+                    category: .bandwidth,
+                    severity: .optimal,
+                    diagnosis: "Your connection is utilizing 80 MHz channel bonding with a link rate of \(Int(metrics.transmitRate)) Mbps.",
+                    actionPlan: "If switching to an uncongested channel, ensure your router's Channel Width is explicitly locked to 80 MHz rather than dropping to 20 MHz."
+                )
+            )
+        }
+        
         // 4. RF Noise Floor & Jitter Diagnostics
         if metrics.noise > -85 {
             adviceList.append(
