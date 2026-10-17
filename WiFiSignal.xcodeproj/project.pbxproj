@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		010010BDA8F302353C4BFA8C /* RoomSurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06ABBE9A9B74978F3A28890C /* RoomSurvey.swift */; };
 		09CF6EE5CA933C8F9766E40A /* SpectrumBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C34D2CFBCAC8EAB5CA5BBE /* SpectrumBarChart.swift */; };
+		0F20AC2D2A0A214086064715 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0A8BAB47785485DC78F4D0F8 /* AppIcon.icns */; };
 		1739098B4B416A6B1BEF6DC2 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D39D2C0532392F0021ABBA /* MainView.swift */; };
 		26CB755823A9D14855168825 /* ChannelSpectrumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC19F51018D4BD5DF63AA624 /* ChannelSpectrumView.swift */; };
 		29E8CD767321AC3D3FE809D9 /* WiFiSignalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE533AFE89F65B0C63D6D6D /* WiFiSignalApp.swift */; };
 		2DC6DB37FE959856B0B40841 /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 819DB88CCF4A3BB3BF4B7B03 /* Network.framework */; };
 		4A235DF067A2E97DDAFB0419 /* OptimizationAdvisorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9A27D51AB9F566B85F68F /* OptimizationAdvisorView.swift */; };
 		60C58CEB1054FBB05F49527F /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C439F8D346CD281F5A71281 /* DashboardView.swift */; };
+		6727EDF25E266D41511D8D10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33C7ECBAF66D75E3FF4B176F /* Assets.xcassets */; };
 		688814A4C7731D9356D470BE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CBAD8E67CE2C73E0F804863 /* CoreLocation.framework */; };
 		6B2A6E26BF559CCAED84E19F /* LocationPermissionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9694D019AC802478B88288EA /* LocationPermissionHelper.swift */; };
 		76969D889D0E8958DC5E8AA6 /* MetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27AC396450A297CD568C1F98 /* MetricCard.swift */; };
@@ -36,11 +38,13 @@
 /* Begin PBXFileReference section */
 		06ABBE9A9B74978F3A28890C /* RoomSurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomSurvey.swift; sourceTree = "<group>"; };
 		09035DC1A546A3CEB919703C /* SignalRadarCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignalRadarCanvas.swift; sourceTree = "<group>"; };
+		0A8BAB47785485DC78F4D0F8 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		24EC0A7402B2201801EB2C0D /* WiFiMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiMonitor.swift; sourceTree = "<group>"; };
 		27AC396450A297CD568C1F98 /* MetricCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricCard.swift; sourceTree = "<group>"; };
 		290D2A74717B9CE45AD98411 /* ScannedNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannedNetwork.swift; sourceTree = "<group>"; };
 		2C439F8D346CD281F5A71281 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		30A7CD984F100888FF0DD1E8 /* WiFiMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiMetrics.swift; sourceTree = "<group>"; };
+		33C7ECBAF66D75E3FF4B176F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4BE533AFE89F65B0C63D6D6D /* WiFiSignalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiSignalApp.swift; sourceTree = "<group>"; };
 		4CBAD8E67CE2C73E0F804863 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		56E9A27D51AB9F566B85F68F /* OptimizationAdvisorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimizationAdvisorView.swift; sourceTree = "<group>"; };
@@ -88,6 +92,8 @@
 		1C7CC68BD543294E2D2098B8 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				0A8BAB47785485DC78F4D0F8 /* AppIcon.icns */,
+				33C7ECBAF66D75E3FF4B176F /* Assets.xcassets */,
 				A23BFE5E3C0475D25509F6D6 /* Info.plist */,
 				BE329082ED2C271152817171 /* WiFiSignal.entitlements */,
 			);
@@ -190,6 +196,7 @@
 			buildConfigurationList = 50B0CB29A40653B6228C8392 /* Build configuration list for PBXNativeTarget "WiFiSignal" */;
 			buildPhases = (
 				E9A8004B89F08464CFD37095 /* Sources */,
+				D18CAB1C98D381472C7657F7 /* Resources */,
 				5D6473D6B4E4675437FC3EB2 /* Frameworks */,
 			);
 			buildRules = (
@@ -235,6 +242,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D18CAB1C98D381472C7657F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F20AC2D2A0A214086064715 /* AppIcon.icns in Resources */,
+				6727EDF25E266D41511D8D10 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E9A8004B89F08464CFD37095 /* Sources */ = {
@@ -338,7 +357,7 @@
 		D568789DD5E058C9883732C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Resources/WiFiSignal.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -357,7 +376,7 @@
 		E9DD5D22CD0C67E0756D40F6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Resources/WiFiSignal.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				GENERATE_INFOPLIST_FILE = NO;

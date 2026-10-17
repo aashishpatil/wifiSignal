@@ -49,6 +49,11 @@ rm -rf ./dist
 mkdir -p "${STAGING_DIR}"
 cp -R "${APP_PATH}" "${STAGING_DIR}/"
 ln -s /Applications "${STAGING_DIR}/Applications"
+if [ -f Resources/AppIcon.icns ]; then
+  cp Resources/AppIcon.icns "${STAGING_DIR}/.VolumeIcon.icns"
+  SetFile -c icnC "${STAGING_DIR}/.VolumeIcon.icns" 2>/dev/null || true
+  SetFile -a C "${STAGING_DIR}" 2>/dev/null || true
+fi
 
 echo "=== 5. Creating ${DMG_PATH} ==="
 rm -f "${DMG_PATH}"
