@@ -20,3 +20,7 @@ DerivedData/
 
 ## Tool caches
 .module-cache*
+
+## Distribution artifacts
+dist/
+*.dmg
