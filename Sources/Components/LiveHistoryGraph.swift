@@ -91,11 +91,11 @@ public struct LiveHistoryGraph: View {
     
     @ViewBuilder
     private func drawGraph(in size: CGSize) -> some View {
-        let values: [Double] = history.map { entry in
+        let values: [Double] = history.compactMap { entry in
             switch displayMode {
             case .rssi: return entry.rssi
             case .quality: return entry.qualityScore
-            case .latency: return entry.latencyMs ?? 0.0
+            case .latency: return entry.latencyMs
             }
         }
         
@@ -196,24 +196,24 @@ public struct LiveHistoryGraph: View {
     }
     
     private var statsFooter: some View {
-        let values: [Double] = history.map { entry in
+        let values: [Double] = history.compactMap { entry in
             switch displayMode {
             case .rssi: return entry.rssi
             case .quality: return entry.qualityScore
-            case .latency: return entry.latencyMs ?? 0.0
+            case .latency: return entry.latencyMs
             }
         }
         
         let minVal = values.min() ?? 0.0
         let maxVal = values.max() ?? 0.0
-        let avgVal = values.reduce(0.0, +) / Double(max(1, values.count))
+        let avgVal = values.isEmpty ? 0.0 : (values.reduce(0.0, +) / Double(values.count))
         let unit = displayMode == .rssi ? " dBm" : (displayMode == .quality ? "%" : " ms")
         
         return HStack(spacing: 20) {
-            statBadge(label: "Current", val: String(format: "%.1f%@", values.last ?? 0.0, unit), color: curveColor)
-            statBadge(label: "Avg", val: String(format: "%.1f%@", avgVal, unit), color: .white.opacity(0.8))
-            statBadge(label: "Peak", val: String(format: "%.1f%@", maxVal, unit), color: .green)
-            statBadge(label: "Low", val: String(format: "%.1f%@", minVal, unit), color: .orange)
+            statBadge(label: "Current", val: values.last != nil ? String(format: "%.1f%@", values.last!, unit) : "--", color: curveColor)
+            statBadge(label: "Avg", val: !values.isEmpty ? String(format: "%.1f%@", avgVal, unit) : "--", color: .white.opacity(0.8))
+            statBadge(label: "Peak", val: !values.isEmpty ? String(format: "%.1f%@", maxVal, unit) : "--", color: .green)
+            statBadge(label: "Low", val: !values.isEmpty ? String(format: "%.1f%@", minVal, unit) : "--", color: .orange)
             
             Spacer()
             

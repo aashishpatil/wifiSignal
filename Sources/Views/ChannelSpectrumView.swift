@@ -296,19 +296,33 @@ public struct ChannelSpectrumView: View {
     }
     
     private func bestChannelFor(band: ChannelBand, candidates: [Int]) -> (ch: Int, count: Int) {
-        let bandUtils = monitor.scanner.channelUtilizations.filter { $0.band == band }
+        let bandNets = monitor.scanner.scannedNetworks.filter { $0.channelBand == band && !$0.isCurrentNetwork }
         var bestCh = candidates.first ?? 1
-        var lowestCount = 999
+        var lowestScore = Double.greatestFiniteMagnitude
+        var bestCount = 0
         
         for ch in candidates {
-            let util = bandUtils.first(where: { $0.channelNumber == ch })
-            let count = util?.networks.count ?? 0
-            if count < lowestCount {
-                lowestCount = count
+            let overlappingNets = bandNets.filter { net in
+                if band == .band2GHz {
+                    return abs(net.channelNumber - ch) <= 4
+                } else {
+                    return net.channelNumber == ch
+                }
+            }
+            let count = overlappingNets.count
+            let interferenceScore = overlappingNets.reduce(0.0) { sum, net in
+                let distanceWeight: Double = (band == .band2GHz)
+                    ? max(0.2, 1.0 - (Double(abs(net.channelNumber - ch)) * 0.2))
+                    : 1.0
+                return sum + (net.signalStrengthRatio * distanceWeight)
+            }
+            if interferenceScore < lowestScore {
+                lowestScore = interferenceScore
                 bestCh = ch
+                bestCount = count
             }
         }
-        return (bestCh, lowestCount == 999 ? 0 : lowestCount)
+        return (bestCh, bestCount)
     }
     
     // MARK: - Scanned Networks Table

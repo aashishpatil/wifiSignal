@@ -51,9 +51,10 @@ public struct SpectrumBarChart: View {
                 Picker("Band", selection: $selectedBand) {
                     Text("2.4 GHz").tag(ChannelBand.band2GHz)
                     Text("5 GHz").tag(ChannelBand.band5GHz)
+                    Text("6 GHz").tag(ChannelBand.band6GHz)
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 180)
+                .frame(width: 240)
             }
             
             // Legend

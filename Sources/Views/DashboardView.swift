@@ -66,7 +66,7 @@ public struct DashboardView: View {
                 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 8) {
-                        Text(monitor.currentMetrics.ssid ?? "Wi-Fi Disconnected")
+                        Text(monitor.currentMetrics.ssid ?? (monitor.currentMetrics.isConnected ? "Wi-Fi Connected" : "Wi-Fi Disconnected"))
                             .font(.system(size: 18, weight: .bold))
                             .foregroundColor(.white)
                         

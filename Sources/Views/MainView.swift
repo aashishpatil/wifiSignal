@@ -81,7 +81,7 @@ public struct MainView: View {
                     .frame(width: 8, height: 8)
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(monitor.currentMetrics.ssid ?? "Disconnected")
+                    Text(monitor.currentMetrics.ssid ?? (monitor.currentMetrics.isConnected ? "Wi-Fi Connected" : "Disconnected"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.white)
                         .lineLimit(1)

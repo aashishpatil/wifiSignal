@@ -28,8 +28,13 @@ public final class NetworkScanner: ObservableObject {
     
     public init() {}
     
-    public func performScan(interface: CWInterface?, currentSSID: String?, currentChannel: Int) {
-        guard let iface = interface else {
+    public func performScan(
+        interface: CWInterface?,
+        currentSSID: String?,
+        currentBSSID: String? = nil,
+        currentChannel: Int
+    ) {
+        guard let ifaceName = interface?.interfaceName ?? CWWiFiClient.shared().interface()?.interfaceName else {
             self.scanErrorMessage = "No active Wi-Fi interface found."
             return
         }
@@ -41,9 +46,16 @@ public final class NetworkScanner: ObservableObject {
         
         scanQueue.async { [weak self] in
             guard let self = self else { return }
+            guard let bgInterface = CWWiFiClient.shared().interface(withName: ifaceName) ?? CWWiFiClient.shared().interface() else {
+                DispatchQueue.main.async {
+                    self.scanErrorMessage = "No active Wi-Fi interface found."
+                    self.isScanning = false
+                }
+                return
+            }
             
             do {
-                let networks = try iface.scanForNetworks(withSSID: nil)
+                let networks = try bgInterface.scanForNetworks(withSSID: nil)
                 
                 var results: [ScannedNetwork] = []
                 for net in networks {
@@ -53,7 +65,16 @@ public final class NetworkScanner: ObservableObject {
                     let chNum = net.wlanChannel?.channelNumber ?? 0
                     let band = net.wlanChannel != nil ? ChannelBand.from(cwBand: net.wlanChannel!.channelBand) : .unknown
                     let width = net.wlanChannel != nil ? ChannelWidth.from(cwWidth: net.wlanChannel!.channelWidth) : .unknown
-                    let isCurrent = (ssid == currentSSID && chNum == currentChannel)
+                    
+                    let isCurrent: Bool
+                    if let curBSSID = currentBSSID, !curBSSID.isEmpty, !bssid.isEmpty {
+                        isCurrent = (bssid.caseInsensitiveCompare(curBSSID) == .orderedSame)
+                    } else if let curSSID = currentSSID, !curSSID.isEmpty, !ssid.isEmpty {
+                        isCurrent = (ssid == curSSID && chNum == currentChannel)
+                    } else {
+                        isCurrent = false
+                    }
+                    
                     let isDFS = net.wlanChannel?.description.contains("DFS") ?? ((52...64).contains(chNum) || (100...144).contains(chNum))
                     let subband = RegulatorySubband.from(channelNumber: chNum, band: band)
                     

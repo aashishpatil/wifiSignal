@@ -15,6 +15,8 @@
 //
 
 import Foundation
+import Network
+import SystemConfiguration
 
 public struct ProbeResult: Equatable {
     public let latencyMs: Double
@@ -31,6 +33,7 @@ public final class GatewayProber: ObservableObject {
     
     private var probeTimer: Timer?
     private var historyWindow: [ProbeResult] = []
+    private var consecutiveFailures: Int = 0
     private let maxHistoryWindow = 15
     private let probeQueue = DispatchQueue(label: "com.wifisignal.prober", qos: .utility)
     
@@ -54,8 +57,18 @@ public final class GatewayProber: ObservableObject {
         isProbing = false
     }
     
-    public func refreshGatewayIP() {
-        probeQueue.async {
+    public func refreshGatewayIP(resetHistory: Bool = false) {
+        if resetHistory {
+            DispatchQueue.main.async {
+                self.historyWindow.removeAll()
+                self.consecutiveFailures = 0
+                self.latestLatencyMs = nil
+                self.latestJitterMs = nil
+                self.packetLossPercent = nil
+            }
+        }
+        probeQueue.async { [weak self] in
+            guard let self = self else { return }
             let ip = self.resolveDefaultGatewayIP()
             DispatchQueue.main.async {
                 self.currentGatewayIP = ip
@@ -63,14 +76,31 @@ public final class GatewayProber: ObservableObject {
         }
     }
     
+    private func isValidIPv4(_ candidate: String) -> String? {
+        let stripped = String(candidate.split(separator: "%").first ?? "")
+        guard !stripped.isEmpty, IPv4Address(stripped) != nil else {
+            return nil
+        }
+        return stripped
+    }
+    
     private func resolveDefaultGatewayIP() -> String? {
+        // 1. Primary: Fast in-process lookup via SystemConfiguration dynamic store
+        if let store = SCDynamicStoreCreate(nil, "com.wifisignal.prober" as CFString, nil, nil),
+           let globalIPv4 = SCDynamicStoreCopyValue(store, "State:/Network/Global/IPv4" as CFString) as? [String: Any],
+           let router = globalIPv4[kSCPropNetIPv4Router as String] as? String,
+           let validIP = isValidIPv4(router) {
+            return validIP
+        }
+        
+        // 2. Fallback: Parse routing table via netstat
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/sbin/netstat")
         task.arguments = ["-nr", "-f", "inet"]
         
         let pipe = Pipe()
         task.standardOutput = pipe
-        task.standardError = Pipe()
+        task.standardError = FileHandle.nullDevice
         
         do {
             try task.run()
@@ -80,10 +110,8 @@ public final class GatewayProber: ObservableObject {
                 for line in output.components(separatedBy: "\n") {
                     let parts = line.split(separator: " ", omittingEmptySubsequences: true)
                     if parts.count >= 2 && parts[0] == "default" {
-                        let ip = String(parts[1])
-                        // Verify not a link-local or empty
-                        if ip.contains(".") {
-                            return ip
+                        if let validIP = isValidIPv4(String(parts[1])) {
+                            return validIP
                         }
                     }
                 }
@@ -95,7 +123,7 @@ public final class GatewayProber: ObservableObject {
     }
     
     private func performSingleProbe() {
-        guard let gateway = currentGatewayIP, !gateway.isEmpty else {
+        guard let gateway = currentGatewayIP, let validGateway = isValidIPv4(gateway) else {
             refreshGatewayIP()
             return
         }
@@ -105,13 +133,12 @@ public final class GatewayProber: ObservableObject {
             
             let task = Process()
             task.executableURL = URL(fileURLWithPath: "/sbin/ping")
-            task.arguments = ["-c", "1", "-t", "1", gateway]
+            task.arguments = ["-c", "1", "-t", "1", "--", validGateway]
             
             let pipe = Pipe()
             task.standardOutput = pipe
-            task.standardError = Pipe()
+            task.standardError = FileHandle.nullDevice
             
-            let start = Date()
             var rtt: Double? = nil
             var success = false
             
@@ -137,8 +164,7 @@ public final class GatewayProber: ObservableObject {
                 success = false
             }
             
-            // If ping exited with non-zero or failed to parse, fall back to delta or record failure
-            let measuredLatency = rtt ?? (success ? Date().timeIntervalSince(start) * 1000.0 : 0.0)
+            let measuredLatency = rtt ?? 0.0
             let result = ProbeResult(latencyMs: measuredLatency, isSuccess: success, timestamp: Date())
             
             DispatchQueue.main.async {
@@ -148,6 +174,16 @@ public final class GatewayProber: ObservableObject {
     }
     
     private func recordProbeResult(_ result: ProbeResult) {
+        if result.isSuccess {
+            consecutiveFailures = 0
+        } else {
+            consecutiveFailures += 1
+            if consecutiveFailures >= 3 {
+                consecutiveFailures = 0
+                refreshGatewayIP()
+            }
+        }
+        
         historyWindow.append(result)
         if historyWindow.count > maxHistoryWindow {
             historyWindow.removeFirst()

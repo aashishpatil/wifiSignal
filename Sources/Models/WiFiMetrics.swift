@@ -124,9 +124,6 @@ public enum RegulatorySubband: String, CaseIterable, Identifiable {
             case 168...177:
                 return .unii4
             default:
-                if (52...64).contains(channelNumber) || (100...144).contains(channelNumber) {
-                    return .unii2A
-                }
                 return .unknown
             }
         case .band6GHz:
@@ -148,7 +145,7 @@ public struct WiFiMetrics: Identifiable, Equatable {
     
     public var rssi: Int = 0               // dBm (e.g. -50)
     public var noise: Int = -95            // dBm (e.g. -95)
-    public var snr: Int { rssi - noise }   // dB (e.g. 45 dB)
+    public var snr: Int { rssi - (noise < 0 ? noise : -95) } // dB (e.g. 45 dB)
     
     public var channelNumber: Int = 0
     public var channelBand: ChannelBand = .unknown

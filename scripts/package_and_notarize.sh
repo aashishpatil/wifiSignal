@@ -15,13 +15,13 @@
 # limitations under the License.
 #
 
-set -e
+set -euo pipefail
 
 APP_NAME="WiFiSignal"
 SCHEME="WiFiSignal"
 CONFIGURATION="Release"
-IDENTITY="Developer ID Application: Aashish PATIL (4DCC945RL8)"
-KEYCHAIN_PROFILE="NOTARY_PROFILE"
+IDENTITY="${IDENTITY:-Developer ID Application: Aashish PATIL (4DCC945RL8)}"
+KEYCHAIN_PROFILE="${KEYCHAIN_PROFILE:-NOTARY_PROFILE}"
 DERIVED_DATA="./DerivedData"
 BUILD_DIR="${DERIVED_DATA}/Build/Products/${CONFIGURATION}"
 APP_PATH="${BUILD_DIR}/${APP_NAME}.app"
@@ -36,7 +36,7 @@ xcodebuild -project "${APP_NAME}.xcodeproj" \
   clean build
 
 echo "=== 2. Code signing ${APP_NAME}.app with Hardened Runtime & Developer ID ==="
-codesign --deep --force --options runtime --timestamp \
+codesign --force --options runtime --timestamp \
   --entitlements Resources/WiFiSignal.entitlements \
   --sign "${IDENTITY}" \
   "${APP_PATH}"

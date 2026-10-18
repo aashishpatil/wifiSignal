@@ -28,7 +28,7 @@ public struct SignalRadarCanvas: View {
     }
     
     public var body: some View {
-        TimelineView(.animation) { (timeline: TimelineViewDefaultContext) in
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: !isConnected)) { (timeline: TimelineViewDefaultContext) in
             Canvas { (context: inout GraphicsContext, size: CGSize) in
                 let time = timeline.date.timeIntervalSinceReferenceDate
                 drawRadar(context: &context, size: size, time: time)

@@ -17,6 +17,7 @@
 import Foundation
 import CoreWLAN
 import CoreLocation
+import Combine
 import SwiftUI
 
 public struct SignalHistoryEntry: Identifiable, Equatable {
@@ -43,17 +44,71 @@ public final class WiFiMonitor: ObservableObject {
     @Published public var currentMetrics: WiFiMetrics = WiFiMetrics()
     @Published public var history: [SignalHistoryEntry] = []
     @Published public var optimizationAdvice: [OptimizationAdvice] = []
+    @Published public var surveyPoints: [RoomSurveyPoint] = [] {
+        didSet {
+            saveSurveyPoints()
+        }
+    }
     @Published public var isMonitoring: Bool = false
     @Published public var lastUpdateTimestamp: Date = Date()
     
     // Configuration
     private var monitorTimer: Timer?
+    private var cancellables = Set<AnyCancellable>()
     private let maxHistoryEntries = 120 // ~60 seconds at 500ms interval
+    private let surveyStorageKey = "com.wifisignal.surveyPoints"
     
     public init() {
+        loadSurveyPoints()
+        setupSubscriptions()
         // Request location authorization to unlock SSID and scan access
         locationHelper.requestPermission()
         startMonitoring()
+    }
+    
+    private func setupSubscriptions() {
+        // Forward child ObservableObject changes so SwiftUI views observing WiFiMonitor stay in sync
+        prober.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        
+        scanner.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.objectWillChange.send()
+                self.optimizationAdvice = OptimizationEngine.analyze(
+                    metrics: self.currentMetrics,
+                    channelUtilizations: self.scanner.channelUtilizations,
+                    scannedNetworks: self.scanner.scannedNetworks
+                )
+            }
+            .store(in: &cancellables)
+        
+        locationHelper.$authorizationStatus
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.pollWiFiMetrics()
+                self.triggerScan()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func loadSurveyPoints() {
+        guard let data = UserDefaults.standard.data(forKey: surveyStorageKey),
+              let decoded = try? JSONDecoder().decode([RoomSurveyPoint].self, from: data) else {
+            return
+        }
+        self.surveyPoints = decoded
+    }
+    
+    private func saveSurveyPoints() {
+        if let encoded = try? JSONEncoder().encode(surveyPoints) {
+            UserDefaults.standard.set(encoded, forKey: surveyStorageKey)
+        }
     }
     
     public func startMonitoring(interval: TimeInterval = 0.5) {
@@ -89,18 +144,23 @@ public final class WiFiMonitor: ObservableObject {
         scanner.performScan(
             interface: iface,
             currentSSID: currentMetrics.ssid,
+            currentBSSID: currentMetrics.bssid,
             currentChannel: currentMetrics.channelNumber
         )
     }
     
     public func pollWiFiMetrics() {
         guard let iface = wifiClient.interface() else {
+            if currentMetrics.isConnected {
+                prober.refreshGatewayIP(resetHistory: true)
+            }
             self.currentMetrics = WiFiMetrics(isConnected: false)
             return
         }
         
         let rssiVal = iface.rssiValue()
-        let noiseVal = iface.noiseMeasurement()
+        let rawNoise = iface.noiseMeasurement()
+        let noiseVal = (rawNoise < 0) ? rawNoise : -95
         let ch = iface.wlanChannel()
         let chNum = ch?.channelNumber ?? 0
         let chBand = ch != nil ? ChannelBand.from(cwBand: ch!.channelBand) : .unknown
@@ -111,6 +171,14 @@ public final class WiFiMonitor: ObservableObject {
         
         let isAssociated = (rssiVal != 0 && chNum != 0)
         let isDFSChannel = ch?.description.contains("DFS") ?? false
+        
+        // Detect network change and refresh gateway IP
+        let networkChanged = (isAssociated != currentMetrics.isConnected)
+            || (ssidName != nil && ssidName != currentMetrics.ssid)
+            || (bssidAddr != nil && bssidAddr != currentMetrics.bssid)
+        if networkChanged {
+            prober.refreshGatewayIP(resetHistory: true)
+        }
         
         let updated = WiFiMetrics(
             isConnected: isAssociated,

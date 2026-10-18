@@ -43,7 +43,7 @@ public struct ScannedNetwork: Identifiable, Equatable {
         beaconInterval: Int = 100,
         isCurrentNetwork: Bool = false
     ) {
-        self.id = bssid.isEmpty ? "\(ssid)_\(channelNumber)" : bssid
+        self.id = bssid.isEmpty ? "\(ssid)_\(channelNumber)_\(rssi)_\(UUID().uuidString)" : bssid
         self.ssid = ssid.isEmpty ? "<Hidden Network>" : ssid
         self.bssid = bssid
         self.rssi = rssi
@@ -58,6 +58,7 @@ public struct ScannedNetwork: Identifiable, Equatable {
     }
     
     public var signalStrengthRatio: Double {
+        guard rssi < 0 else { return 0.0 }
         // -95 dBm -> 0.0, -30 dBm -> 1.0
         return max(0.0, min(1.0, Double(rssi + 95) / 65.0))
     }
@@ -65,6 +66,9 @@ public struct ScannedNetwork: Identifiable, Equatable {
     public var signalColor: Color {
         if isCurrentNetwork {
             return Color(red: 0.0, green: 0.9, blue: 1.0)
+        }
+        guard rssi < 0 else {
+            return Color(red: 0.4, green: 0.7, blue: 0.9)
         }
         if rssi > -60 {
             return Color(red: 0.9, green: 0.4, blue: 0.4) // Strong neighbor = high interference

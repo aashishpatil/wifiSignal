@@ -18,7 +18,6 @@ import SwiftUI
 
 public struct RoomSurveyView: View {
     @ObservedObject var monitor: WiFiMonitor
-    @State private var surveyPoints: [RoomSurveyPoint] = []
     @State private var newRoomName: String = ""
     @State private var selectedPreset: String = "Living Room"
     
@@ -38,7 +37,7 @@ public struct RoomSurveyView: View {
                 loggingControlCard
                 
                 // Router Placement Recommendation Summary (if at least 2 rooms logged)
-                if surveyPoints.count >= 2 {
+                if monitor.surveyPoints.count >= 2 {
                     placementAuditSummaryCard
                 }
                 
@@ -69,9 +68,9 @@ public struct RoomSurveyView: View {
             
             Spacer()
             
-            if !surveyPoints.isEmpty {
+            if !monitor.surveyPoints.isEmpty {
                 Button("Clear Survey", role: .destructive) {
-                    surveyPoints.removeAll()
+                    monitor.surveyPoints.removeAll()
                 }
                 .buttonStyle(.bordered)
             }
@@ -188,13 +187,13 @@ public struct RoomSurveyView: View {
         )
         
         withAnimation {
-            surveyPoints.append(point)
+            monitor.surveyPoints.append(point)
             newRoomName = ""
         }
     }
     
     private var placementAuditSummaryCard: some View {
-        let sorted = surveyPoints.sorted { $0.qualityScore > $1.qualityScore }
+        let sorted = monitor.surveyPoints.sorted { $0.qualityScore > $1.qualityScore }
         let best = sorted.first!
         let worst = sorted.last!
         let scoreDiff = best.qualityScore - worst.qualityScore
@@ -278,11 +277,11 @@ public struct RoomSurveyView: View {
     
     private var loggedRoomsList: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Surveyed Locations (\(surveyPoints.count))", systemImage: "list.number")
+            Label("Surveyed Locations (\(monitor.surveyPoints.count))", systemImage: "list.number")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundColor(.white)
             
-            if surveyPoints.isEmpty {
+            if monitor.surveyPoints.isEmpty {
                 VStack(spacing: 8) {
                     Text("No rooms surveyed yet.")
                         .foregroundColor(.white.opacity(0.5))
@@ -294,7 +293,7 @@ public struct RoomSurveyView: View {
                 .frame(maxWidth: .infinity)
                 .padding(24)
             } else {
-                ForEach(surveyPoints.sorted(by: { $0.qualityScore > $1.qualityScore })) { pt in
+                ForEach(monitor.surveyPoints.sorted(by: { $0.qualityScore > $1.qualityScore })) { pt in
                     roomRow(pt: pt)
                 }
             }
