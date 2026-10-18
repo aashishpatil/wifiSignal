@@ -1,6 +1,37 @@
-# WiFi Signal 📶
+<p align="center">
+  <img src="docs/app_icon.png" width="128" height="128" alt="WiFi Signal App Icon" />
+</p>
 
-> A native macOS SwiftUI application designed to analyze Wi-Fi signal strength in real time, inspect the active channel, detect radio interference and channel congestion, and guide optimal router placement.
+<h1 align="center">WiFi Signal</h1>
+
+<p align="center">
+  <b>A native macOS SwiftUI application designed to analyze Wi-Fi signal strength in real time, inspect the active channel, detect radio interference and channel congestion, and guide optimal router placement.</b>
+</p>
+
+<p align="center">
+  <a href="https://github.com/aashishpatil/wifiSignal/releases/latest/download/WiFiSignal.dmg">
+    <img src="https://img.shields.io/badge/Download-WiFiSignal.dmg-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download WiFiSignal for macOS" />
+  </a>
+  <a href="https://github.com/aashishpatil/wifiSignal/releases/latest">
+    <img src="https://img.shields.io/github/v/release/aashishpatil/wifiSignal?style=for-the-badge&label=Latest%20Release&color=007AFF" alt="Latest Release" />
+  </a>
+  <a href="https://github.com/aashishpatil/wifiSignal/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-34C759?style=for-the-badge" alt="Apache 2.0 License" />
+  </a>
+</p>
+
+---
+
+## 📥 Download & Installation
+
+1. **[Download the Latest Release (`WiFiSignal.dmg`)](https://github.com/aashishpatil/wifiSignal/releases/latest/download/WiFiSignal.dmg)**
+2. Double-click the downloaded `.dmg` file.
+3. Drag **WiFiSignal** into your **Applications** folder.
+4. Launch **WiFiSignal** from your Applications folder, Spotlight, or Launchpad.
+
+> **Apple Notarized**: WiFiSignal is signed with Apple Developer ID and notarized by Apple. It runs natively on Apple Silicon (M1/M2/M3/M4) and Intel Macs running macOS 14.0 (Sonoma) or newer.
+
+---
 
 ![WiFi Signal Dashboard](docs/screenshot.png)
 
@@ -9,15 +40,15 @@
 ## ✨ Features
 
 ### 1. 2D Real-Time Dashboard
-* **Dynamic Waveform & Radar Visualizer**: 60fps pulsating concentric radar canvas with a rotating sweep beam, color-shifting from Emerald Green (pristine) to Crimson (dead zone).
+* **Dynamic Waveform & Radar Visualizer**: 30fps pulsating concentric radar canvas with a rotating sweep beam, color-shifting from Emerald Green (pristine) to Crimson (dead zone).
 * **Radial Signal Gauge**: High-precision 0–100% Signal Quality Index (SQI) fusing physical RF metrics with link-layer telemetry.
 * **Live Oscilloscope History**: Scrolling timeline plotting live RSSI (dBm), Noise Floor (dBm), and Gateway Latency (ms) over a sliding 60-second window as you walk around with your MacBook.
 * **6-Metric Telemetry HUD**:
-  * **Signal Strength**: Raw `RSSI` in dBm (e.g. `-52 dBm`)
-  * **Connected Channel**: Active channel (e.g. `Ch 157`), band (`5 GHz`), and channel width (`80 MHz`)
-  * **Noise Floor & SNR**: Measures background RF noise (`-95 dBm`) and computes true `SNR` (`43 dB`)
-  * **Transmit Link Speed**: Negotiated PHY speed in Mbps (e.g. `866 Mbps`)
-  * **Router Ping Latency & Jitter**: Direct latency and RFC-3550 jitter to your default gateway (`192.168.1.1`)
+  * **Signal Strength**: Intuitive 0–100% scale, 4-bar stepped indicator, and plain-English proximity rating alongside technical `RSSI` dBm (e.g. `95% • -42 dBm • Maximum (Near Router)`)
+  * **Connected Channel**: Active channel (e.g. `Ch 36`), band (`5 GHz / 6 GHz`), and channel width (`80 MHz / 160 MHz`)
+  * **Noise Floor & SNR**: Measures background RF noise with Apple Silicon zero-floor normalization and computes true `SNR` (e.g. `45 dB`)
+  * **Transmit Link Speed**: Negotiated PHY speed in Mbps (e.g. `2400 Mbps`)
+  * **Router Ping Latency & Jitter**: In-process gateway resolution and low-overhead ICMP probing to your default router
   * **Packet Loss Rate**: Sliding window loss rate with retransmission alerts
 
 ### 2. RF Spectrum & Channel Interference Analyzer
