@@ -29,7 +29,7 @@
 3. Drag **WiFiSignal** into your **Applications** folder.
 4. Launch **WiFiSignal** from your Applications folder, Spotlight, or Launchpad.
 
-> **Apple Notarized**: WiFiSignal is signed with Apple Developer ID and notarized by Apple. It runs natively on Apple Silicon (M1/M2/M3/M4) and Intel Macs running macOS 14.0 (Sonoma) or newer.
+> **Security & Gatekeeper**: WiFiSignal is signed with a verified Developer ID certificate and notarized by Apple (automated malware screening). It opens smoothly in macOS Gatekeeper without security warnings on macOS 14.0 (Sonoma) or newer.
 
 ---
 
