@@ -20,7 +20,8 @@ public final class OptimizationEngine {
     public static func analyze(
         metrics: WiFiMetrics,
         channelUtilizations: [ChannelUtilization],
-        scannedNetworks: [ScannedNetwork]
+        scannedNetworks: [ScannedNetwork],
+        roamEvents: [RoamEvent] = []
     ) -> [OptimizationAdvice] {
         var adviceList: [OptimizationAdvice] = []
         
@@ -163,6 +164,46 @@ public final class OptimizationEngine {
                     severity: .optimal,
                     diagnosis: "Your connection is utilizing 80 MHz channel bonding with a link rate of \(Int(metrics.transmitRate)) Mbps.",
                     actionPlan: "If switching to an uncongested channel, ensure your router's Channel Width is explicitly locked to 80 MHz rather than dropping to 20 MHz."
+                )
+            )
+        } else if (metrics.channelBand == .band5GHz || metrics.channelBand == .band6GHz) &&
+                    (metrics.channelWidth == .width20MHz || metrics.channelWidth == .width40MHz) {
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "Narrow \(metrics.channelWidth.rawValue) Width on \(metrics.channelBand.rawValue)",
+                    category: .bandwidth,
+                    severity: .tip,
+                    diagnosis: "Your \(metrics.channelBand.rawValue) link is running at \(metrics.channelWidth.rawValue) (\(Int(metrics.transmitRate)) Mbps PHY), capping maximum throughput.",
+                    actionPlan: "In router Wireless Settings, unlock 80 MHz (or 160 MHz) channel width and ensure Wi-Fi 6 (802.11ax), OFDMA, and WMM are enabled."
+                )
+            )
+        }
+        
+        // Active VPN / Proxy check
+        if metrics.isVPNActive || metrics.isProxyActive {
+            let tunnelLabel = metrics.isVPNActive ? "VPN (\(metrics.vpnInterfaceName ?? "tunnel"))" : "HTTP/SOCKS Proxy"
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "\(tunnelLabel) Active",
+                    category: .bandwidth,
+                    severity: .tip,
+                    diagnosis: "Traffic is currently routed through \(tunnelLabel), which can cap speeds and increase latency.",
+                    actionPlan: "Temporarily pause the VPN/proxy if benchmarking raw Wi-Fi or ISP speeds in Deep Diagnostic."
+                )
+            )
+        }
+        
+        // Frequent roaming / Band Steering instability
+        let recentCutoff = Date().addingTimeInterval(-600)
+        let recentRoams = roamEvents.filter { $0.timestamp >= recentCutoff }.count
+        if recentRoams >= 3 {
+            adviceList.append(
+                OptimizationAdvice(
+                    title: "Frequent Roaming / Band-Steering Flapping",
+                    category: .interference,
+                    severity: .warning,
+                    diagnosis: "Observed \(recentRoams) AP roams or link drops in the past 10 minutes.",
+                    actionPlan: "Disable Smart Connect / Band Steering on your router or adjust mesh roaming sensitivity if your Mac bounces while stationary."
                 )
             )
         }

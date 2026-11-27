@@ -83,6 +83,27 @@ public struct DashboardView: View {
                             .padding(.vertical, 2)
                             .background(Color.green.opacity(0.15))
                             .clipShape(Capsule())
+                            
+                            let phyBadge = monitor.currentMetrics.phyMode.displayBadge(for: monitor.currentMetrics.channelBand)
+                            if !phyBadge.isEmpty {
+                                Text(phyBadge)
+                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                    .foregroundColor(.cyan)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.cyan.opacity(0.15))
+                                    .clipShape(Capsule())
+                            }
+                            
+                            if monitor.currentMetrics.isVPNActive || monitor.currentMetrics.isProxyActive {
+                                Text(monitor.currentMetrics.isVPNActive ? "VPN" : "PROXY")
+                                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                    .foregroundColor(.orange)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.18))
+                                    .clipShape(Capsule())
+                            }
                         }
                     }
                     
@@ -275,10 +296,14 @@ public struct DashboardView: View {
             )
             
             // 4. Transmit PHY Rate
+            let totalErrors = monitor.currentMetrics.interfaceInputErrors &+ monitor.currentMetrics.interfaceOutputErrors
+            let phySubtitle = monitor.currentMetrics.phyMode == .unknown
+                ? "Negotiated PHY speed"
+                : (totalErrors > 0 ? "\(monitor.currentMetrics.phyMode.generationLabel) • \(totalErrors) err" : monitor.currentMetrics.phyMode.generationLabel)
             MetricCard(
                 title: "Transmit Link Rate",
                 value: String(format: "%.0f Mbps", monitor.currentMetrics.transmitRate),
-                subtitle: "Negotiated PHY speed",
+                subtitle: phySubtitle,
                 systemImage: "bolt.horizontal.fill",
                 accentColor: Color(red: 0.2, green: 0.8, blue: 1.0)
             )
@@ -295,13 +320,15 @@ public struct DashboardView: View {
             )
             
             // 6. Packet Loss Rate
-            let lossStr = monitor.currentMetrics.packetLossPercent != nil ? String(format: "%.1f%%", monitor.currentMetrics.packetLossPercent!) : "0.0%"
+            let lossPct = monitor.currentMetrics.packetLossPercent ?? 0
+            let lossStr = monitor.currentMetrics.packetLossPercent != nil ? String(format: "%.1f%%", lossPct) : "0.0%"
+            let roamSuffix = monitor.roamEvents.isEmpty ? "" : " • \(monitor.roamEvents.count) roams"
             MetricCard(
                 title: "Packet Loss Rate",
                 value: lossStr,
-                subtitle: (monitor.currentMetrics.packetLossPercent ?? 0) > 0 ? "Retransmissions detected" : "Zero packet loss",
+                subtitle: (lossPct > 0 ? "Retransmissions detected" : "Zero packet loss") + roamSuffix,
                 systemImage: "chart.line.uptrend.xyaxis",
-                accentColor: (monitor.currentMetrics.packetLossPercent ?? 0) > 2 ? .red : .green
+                accentColor: lossPct > 2 ? .red : .green
             )
         }
     }

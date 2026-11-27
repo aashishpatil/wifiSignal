@@ -134,6 +134,93 @@ public enum RegulatorySubband: String, CaseIterable, Identifiable {
     }
 }
 
+public enum WiFiPHYMode: String, Codable, Equatable, CaseIterable {
+    case none = "None"
+    case mode11a = "802.11a"
+    case mode11b = "802.11b"
+    case mode11g = "802.11g"
+    case mode11n = "802.11n"
+    case mode11ac = "802.11ac"
+    case mode11ax = "802.11ax"
+    case mode11be = "802.11be"
+    case unknown = "Unknown"
+    
+    public var generationLabel: String {
+        switch self {
+        case .mode11be: return "Wi-Fi 7 (802.11be)"
+        case .mode11ax: return "Wi-Fi 6 (802.11ax)"
+        case .mode11ac: return "Wi-Fi 5 (802.11ac)"
+        case .mode11n: return "Wi-Fi 4 (802.11n)"
+        case .mode11g: return "802.11g"
+        case .mode11a: return "802.11a"
+        case .mode11b: return "802.11b"
+        case .none, .unknown: return "Unknown"
+        }
+    }
+    
+    public func displayBadge(for band: ChannelBand) -> String {
+        switch self {
+        case .mode11be: return "WI-FI 7"
+        case .mode11ax: return band == .band6GHz ? "WI-FI 6E" : "WI-FI 6"
+        case .mode11ac: return "WI-FI 5"
+        case .mode11n: return "WI-FI 4"
+        default: return ""
+        }
+    }
+    
+    public static func from(cwMode: CWPHYMode) -> WiFiPHYMode {
+        switch cwMode.rawValue {
+        case 0: return .none
+        case 1: return .mode11a
+        case 2: return .mode11b
+        case 3: return .mode11g
+        case 4: return .mode11n
+        case 5: return .mode11ac
+        case 6: return .mode11ax
+        case 7: return .mode11be
+        default: return .unknown
+        }
+    }
+}
+
+public struct RoamEvent: Identifiable, Codable, Equatable {
+    public enum Kind: String, Codable, Equatable {
+        case roamed = "Roamed AP"
+        case disconnected = "Disconnected"
+        case reconnected = "Reconnected"
+        case channelChanged = "Channel Hop"
+    }
+    
+    public let id: UUID
+    public let timestamp: Date
+    public let kind: Kind
+    public let fromBSSID: String?
+    public let toBSSID: String?
+    public let channel: Int
+    public let band: String
+    public let summary: String
+    
+    public init(
+        id: UUID = UUID(),
+        timestamp: Date = Date(),
+        kind: Kind,
+        fromBSSID: String? = nil,
+        toBSSID: String? = nil,
+        channel: Int,
+        band: String,
+        summary: String
+    ) {
+        self.id = id
+        self.timestamp = timestamp
+        self.kind = kind
+        self.fromBSSID = fromBSSID
+        self.toBSSID = toBSSID
+        self.channel = channel
+        self.band = band
+        self.summary = summary
+    }
+}
+
 public struct WiFiMetrics: Identifiable, Equatable {
     public let id = UUID()
     public var timestamp: Date = Date()
@@ -152,7 +239,16 @@ public struct WiFiMetrics: Identifiable, Equatable {
     public var channelWidth: ChannelWidth = .unknown
     public var isDFS: Bool = false
     public var regulatorySubband: RegulatorySubband = .unknown
+    public var phyMode: WiFiPHYMode = .unknown
     public var transmitRate: Double = 0.0  // Mbps
+    
+    // Interface & Environment telemetry
+    public var interfaceInputErrors: UInt32 = 0
+    public var interfaceOutputErrors: UInt32 = 0
+    public var isVPNActive: Bool = false
+    public var vpnInterfaceName: String? = nil
+    public var isProxyActive: Bool = false
+    public var localTrafficMbps: Double = 0.0
     
     // Gateway telemetry
     public var gatewayIP: String? = nil
@@ -172,7 +268,14 @@ public struct WiFiMetrics: Identifiable, Equatable {
         channelWidth: ChannelWidth = .unknown,
         isDFS: Bool? = nil,
         regulatorySubband: RegulatorySubband? = nil,
+        phyMode: WiFiPHYMode = .unknown,
         transmitRate: Double = 0.0,
+        interfaceInputErrors: UInt32 = 0,
+        interfaceOutputErrors: UInt32 = 0,
+        isVPNActive: Bool = false,
+        vpnInterfaceName: String? = nil,
+        isProxyActive: Bool = false,
+        localTrafficMbps: Double = 0.0,
         gatewayIP: String? = nil,
         gatewayLatencyMs: Double? = nil,
         gatewayJitterMs: Double? = nil,
@@ -190,7 +293,14 @@ public struct WiFiMetrics: Identifiable, Equatable {
         let computedSubband = regulatorySubband ?? RegulatorySubband.from(channelNumber: channelNumber, band: channelBand)
         self.regulatorySubband = computedSubband
         self.isDFS = isDFS ?? computedSubband.isDFS
+        self.phyMode = phyMode
         self.transmitRate = transmitRate
+        self.interfaceInputErrors = interfaceInputErrors
+        self.interfaceOutputErrors = interfaceOutputErrors
+        self.isVPNActive = isVPNActive
+        self.vpnInterfaceName = vpnInterfaceName
+        self.isProxyActive = isProxyActive
+        self.localTrafficMbps = localTrafficMbps
         self.gatewayIP = gatewayIP
         self.gatewayLatencyMs = gatewayLatencyMs
         self.gatewayJitterMs = gatewayJitterMs

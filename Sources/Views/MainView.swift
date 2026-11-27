@@ -18,6 +18,7 @@ import SwiftUI
 
 public enum NavigationTab: String, CaseIterable, Identifiable {
     case dashboard = "Live Dashboard"
+    case diagnostic = "Deep Diagnostic"
     case spectrum = "RF Spectrum & Channels"
     case survey = "Room Survey Walk"
     case advisor = "Placement Advisor"
@@ -27,6 +28,7 @@ public enum NavigationTab: String, CaseIterable, Identifiable {
     public var icon: String {
         switch self {
         case .dashboard: return "waveform.path.ecg"
+        case .diagnostic: return "stethoscope"
         case .spectrum: return "chart.bar.xaxis"
         case .survey: return "figure.walk.motion"
         case .advisor: return "lightbulb.max.fill"
@@ -59,6 +61,8 @@ public struct MainView: View {
                 switch selectedTab {
                 case .dashboard:
                     DashboardView(monitor: monitor)
+                case .diagnostic:
+                    NetworkDiagnosticView(monitor: monitor, runner: monitor.diagnosticRunner)
                 case .spectrum:
                     ChannelSpectrumView(monitor: monitor)
                 case .survey:
